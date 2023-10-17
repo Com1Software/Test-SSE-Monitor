@@ -15,20 +15,34 @@ func main() {
 	agent := SSE()
 	xip:=fmt.Sprintf("%s",GetOutboundIP())
 	port:="8080"
-	fmt.Println("Vehicle Boot Controller")
+//	
+//--- tctl 0 = normal mode test 
+//         1 = high speed mode test
+//
+    tctl:=0
+	tc:=0
+	fmt.Println("Test SSE Server")
 	fmt.Printf("Operating System : %s\n", runtime.GOOS)
 	fmt.Printf("Outbound IP  : %s Port : %s\n", xip,port)
 
 	go func() {
 		for {
-			time.Sleep(time.Second * 1)
+			switch{
+			case tctl==0:
+		 	time.Sleep(time.Second * 1)
+		    case tctl==1:
+			time.Sleep(time.Second * -1)
+			tc++
+			fmt.Printf("loop count = %d\n",tc)
+			}
 			dtime:=fmt.Sprintf("%s",time.Now())
-			event := fmt.Sprintf("Controller:%s %v\n",GetOutboundIP(),dtime[0:24])
+			event := fmt.Sprintf("Controller=%s Time=%v\n",GetOutboundIP(),dtime[0:24])
 			agent.Notifier <- []byte(event)
 		}
 	}()
-
+if tctl==0{
 	Openbrowser(xip+":"+port)
+}
 	http.ListenAndServe(xip+":"+port, agent)
 
 }
