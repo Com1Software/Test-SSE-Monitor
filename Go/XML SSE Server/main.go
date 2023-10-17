@@ -13,38 +13,45 @@ import (
 //-------------------------------------------------------------------------
 func main() {
 	agent := SSE()
-	xip:=fmt.Sprintf("%s",GetOutboundIP())
-	port:="8080"
-//	
-//--- tctl 0 = normal mode test 
-//         1 = high speed mode test
-//
-    tctl:=0
-	tc:=0
+	xip := fmt.Sprintf("%s", GetOutboundIP())
+	port := "8080"
+	//
+	//--- tctl 0 = normal mode test
+	//         1 = high speed mode test
+	//
+	tctl := 0
+	tc := 0
 	fmt.Println("Test SSE Server")
 	fmt.Printf("Operating System : %s\n", runtime.GOOS)
-	fmt.Printf("Outbound IP  : %s Port : %s\n", xip,port)
+	fmt.Printf("Outbound IP  : %s Port : %s\n", xip, port)
+	if runtime.GOOS == "windows" {
+		xip = "http://localhost"
+	}
 
 	go func() {
 		for {
-			switch{
-			case tctl==0:
-		 	time.Sleep(time.Second * 1)
-		    case tctl==1:
-			time.Sleep(time.Second * -1)
-			tc++
-			fmt.Printf("loop count = %d\n",tc)
+			switch {
+			case tctl == 0:
+				time.Sleep(time.Second * 1)
+			case tctl == 1:
+				time.Sleep(time.Second * -1)
+				tc++
+				fmt.Printf("loop count = %d\n", tc)
 			}
-			dtime:=fmt.Sprintf("%s",time.Now())
-			event := fmt.Sprintf("Controller=%s Time=%v\n",GetOutboundIP(),dtime[0:24])
+			dtime := fmt.Sprintf("%s", time.Now())
+			event := fmt.Sprintf("Controller=%s Time=%v\n", GetOutboundIP(), dtime[0:24])
 			agent.Notifier <- []byte(event)
 		}
 	}()
-if tctl==0{
-	Openbrowser(xip+":"+port)
-}
-	http.ListenAndServe(xip+":"+port, agent)
-
+	if tctl == 0 {
+		Openbrowser(xip + ":" + port)
+	}
+	fmt.Printf("Listening at  : %s Port : %s\n", xip, port)
+	if runtime.GOOS == "windows" {
+		http.ListenAndServe(":"+port, agent)
+	} else {
+		http.ListenAndServe(xip+":"+port, agent)
+	}
 }
 
 // Openbrowser : Opens default web browser to specified url
