@@ -8,7 +8,7 @@ import (
 
 func main() {
 	url := "http://com1software.com"
-	// url = "http://192.168.1.105:8080"
+	url = "http://192.168.1.105:8080"
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
