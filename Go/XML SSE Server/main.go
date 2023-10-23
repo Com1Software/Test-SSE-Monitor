@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net"
 	"net/http"
 	"os/exec"
@@ -15,6 +16,8 @@ func main() {
 	agent := SSE()
 	xip := fmt.Sprintf("%s", GetOutboundIP())
 	port := "8080"
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
 	//
 	//--- tctl 0 = normal mode test
 	//         1 = high speed mode test
@@ -42,7 +45,7 @@ func main() {
 			msg := "<message>"
 			msg = msg + "<controller>" + fmt.Sprint(GetOutboundIP()) + "</controller>"
 			msg = msg + "<date_time>" + dtime[0:24] + "</date_time>"
-
+			msg = msg + "<rand_num>" + fmt.Sprintf("%d", r1.Intn(100)) + "</rand_num>"
 			msg = msg + "/<message>\n"
 			event := msg
 			//		event := fmt.Sprintf("Controller=%s Time=%v\n", GetOutboundIP(), dtime[0:24])
