@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-//-------------------------------------------------------------------------
+// -------------------------------------------------------------------------
 func main() {
 	agent := SSE()
 	xip := fmt.Sprintf("%s", GetOutboundIP())
@@ -39,7 +39,13 @@ func main() {
 				fmt.Printf("loop count = %d\n", tc)
 			}
 			dtime := fmt.Sprintf("%s", time.Now())
-			event := fmt.Sprintf("Controller=%s Time=%v\n", GetOutboundIP(), dtime[0:24])
+			msg := "<message>"
+			msg = msg + "<controller>" + fmt.Sprint(GetOutboundIP()) + "</controller>"
+			msg = msg + "<date_time>" + dtime[0:24] + "</date_time>"
+
+			msg = msg + "/<message>\n"
+			event := msg
+			//		event := fmt.Sprintf("Controller=%s Time=%v\n", GetOutboundIP(), dtime[0:24])
 			agent.Notifier <- []byte(event)
 		}
 	}()
