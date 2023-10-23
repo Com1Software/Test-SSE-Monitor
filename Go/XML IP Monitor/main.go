@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"context"
+	"encoding/xml"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,11 +13,17 @@ import (
 	"time"
 )
 
+type message struct {
+	Controller string `xml:"controller"`
+	DateTime   string `xml:"date_time"`
+}
+
 func main() {
 	url := "http://com1software.com"
 	url = "http://192.168.1.105:8080"
 	tc := 0
 	tctl := 0
+	msg := &message{}
 	switch {
 	case tctl == 0:
 		resp, err := http.Get(url)
@@ -29,10 +36,11 @@ func main() {
 			if erra != nil {
 				log.Fatal(err)
 			}
-			fmt.Printf("%s", string(line))
+			xml.Unmarshal(line, &msg)
+			fmt.Printf("%s\n", string(msg.Controller))
+
 		}
 	case tctl == 1:
-
 		ctx := cancelCtxOnSigterm(context.Background())
 		startWork(ctx, url)
 		fmt.Println("test")
