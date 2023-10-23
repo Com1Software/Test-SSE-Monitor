@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"encoding/xml"
 	"fmt"
 	"log"
 	"math/rand"
@@ -11,6 +13,12 @@ import (
 	"time"
 )
 
+type message struct {
+	Controller string `xml:"controller"`
+	DateTime   string `xml:"date_time"`
+	RandNum    string `xml:"rand_num"`
+}
+
 // -------------------------------------------------------------------------
 func main() {
 	agent := SSE()
@@ -18,6 +26,7 @@ func main() {
 	port := "8080"
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
+	msg := &message{}
 	//
 	//--- tctl 0 = normal mode test
 	//         1 = high speed mode test
@@ -54,6 +63,20 @@ func main() {
 	}()
 	if tctl == 0 {
 		Openbrowser(xip + ":" + port)
+		resp, err := http.Get(xip + ":" + port)
+		if err != nil {
+			log.Fatal(err)
+		}
+		reader := bufio.NewReader(resp.Body)
+		for {
+			line, erra := reader.ReadBytes('\n')
+			if erra != nil {
+				log.Fatal(err)
+			}
+			xml.Unmarshal(line, &msg)
+			fmt.Printf("%s  -  %s  -  %s\n", string(msg.Controller), string(msg.DateTime), string(msg.RandNum))
+
+		}
 	}
 	fmt.Printf("Listening at  : %s Port : %s\n", xip, port)
 	if runtime.GOOS == "windows" {
