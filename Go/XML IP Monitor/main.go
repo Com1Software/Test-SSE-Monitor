@@ -16,6 +16,7 @@ import (
 type message struct {
 	Controller string `xml:"controller"`
 	DateTime   string `xml:"date_time"`
+	RandNum    string `xml:"rand_num"`
 }
 
 func main() {
@@ -37,7 +38,7 @@ func main() {
 				log.Fatal(err)
 			}
 			xml.Unmarshal(line, &msg)
-			fmt.Printf("%s\n", string(msg.Controller))
+			fmt.Printf("%s  -  %s  -  %s\n", string(msg.Controller), string(msg.DateTime), string(msg.RandNum))
 
 		}
 	case tctl == 1:
